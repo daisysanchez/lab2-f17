@@ -353,7 +353,7 @@ copyuvm(pde_t *pgdir, uint sz)
 		if(mappages(d, (void*)i, PGSIZE, PADDR(mem), PTE_W|PTE_U) < 0)
 			goto bad;
 	}
-//end lab3
+//nd lab3
 
   return d;
 
