@@ -161,7 +161,15 @@ growproc(int n)
   uint sz;
   struct proc *curproc = myproc();
 
-  sz = curproc->sz;
+//lab3
+  	sz = curproc->sz_heap;
+	
+	if((sz+n) > (curproc->sz_stack-PGSIZE)){
+		cprintf("Error: HEap reaches the top\n");
+		return -1;
+	}
+
+//end lab3
   if(n > 0){
     if((sz = allocuvm(curproc->pgdir, sz, sz + n)) == 0)
       return -1;
@@ -197,6 +205,10 @@ fork(void)
     return -1;
   }
   np->sz = curproc->sz;
+//lab3
+	np->sz_stack = curproc->sz_stack;
+	np->sz_heap = curproc->sz_heap;
+//endlab3
   np->parent = curproc;
   *np->tf = *curproc->tf;
 
@@ -532,3 +544,20 @@ procdump(void)
     cprintf("\n");
   }
 }
+
+//lab3
+int
+growstack(void){
+	struct proc *p = myproc();
+	uint sz = p->sz_stack-PGSIZE;
+	if(sz < p->sz_heap+PGSIZE)
+		return -1;
+	if((sz = allocuvm(p->pgdir, sz, sz + PGSIZE)) == 0)
+		return -1;
+
+	p->sz_stack = sz-PGSIZE;
+	switchuvm(p);
+	return 0;
+}
+	
+//end lab3

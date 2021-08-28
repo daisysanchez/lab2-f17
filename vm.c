@@ -27,6 +27,9 @@ seginit(void)
   c->gdt[SEG_UCODE] = SEG(STA_X|STA_R, 0, 0xffffffff, DPL_USER);
   c->gdt[SEG_UDATA] = SEG(STA_W, 0, 0xffffffff, DPL_USER);
   lgdt(c->gdt, sizeof(c->gdt));
+
+	cpu = c;
+	proc = 0;
 }
 
 // Return the address of the PTE in page table pgdir
@@ -335,6 +338,23 @@ copyuvm(pde_t *pgdir, uint sz)
     if(mappages(d, (void*)i, PGSIZE, V2P(mem), flags) < 0)
       goto bad;
   }
+//lab3
+	i = USERTOP - PGSIZE;
+
+	for(; i >= proc->sz_stack; i-=PGSIZE){
+		if((pte = walkpgdir(pgdir, (void*) i, 0)) == 0)
+			panic("copyvum:pte should exist");
+		if(!(*pte & PTE_P))
+			panic("copyumv: page not present");
+		pa = PTE_ADDR(*pte);
+		if((mem = kalloc()) == 0)
+			goto bad;
+		memmove(mem, (char*pa, PGSIZE));
+		if(mappages(d, (void*)i, PGSIZE, PADDR(mem), PTE_W|PTE_U) < 0)
+			goto bad;
+	}
+//end lab3
+
   return d;
 
 bad:

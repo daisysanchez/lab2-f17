@@ -39,7 +39,7 @@ exec(char *path, char **argv)
     goto bad;
 
   // Load program into memory.
-  sz = 0;
+  sz = PGSIZE; //lab3
   for(i=0, off=elf.phoff; i<elf.phnum; i++, off+=sizeof(ph)){
     if(readi(ip, (char*)&ph, off, sizeof(ph)) != sizeof(ph))
       goto bad;
@@ -69,6 +69,17 @@ exec(char *path, char **argv)
   sp = sz;
 
   // Push argument strings, prepare rest of stack in ustack.
+ 
+//lab3
+
+	int sz_stack = 0;
+	
+	if((sz_stack = allocuvm(pgdir, USERTOP-PGSIZE, USERTOP)) == 0)
+		panic("allocuvm sz_stack failed\n");
+
+	sp = sz_stack;
+
+//end lab3
   for(argc = 0; argv[argc]; argc++) {
     if(argc >= MAXARG)
       goto bad;
@@ -96,7 +107,11 @@ exec(char *path, char **argv)
   // Commit to the user image.
   oldpgdir = curproc->pgdir;
   curproc->pgdir = pgdir;
-  curproc->sz = sz;
+//lab3
+  	curproc->sz = sz_stack;
+	curproc->sz_stack = sz_stack-PGSIZE;
+	curproc->sz_heap = sz;
+//end lab3
   curproc->tf->eip = elf.entry;  // main
   curproc->tf->esp = sp;
   switchuvm(curproc);

@@ -148,3 +148,20 @@ syscall(void)
     curproc->tf->eax = -1;
   }
 }
+
+//lab3
+
+int 
+checkbounds(struct proc *p, int addr){
+	if(p->pid != 1){
+		if(addr < 0x1000 || 
+			(addr >= p->sz_heap && addr < p-> sz_stack) || 
+			addr >= USERTOP)
+
+			return -1;
+	}
+
+	return 0;
+}
+
+//end lab3

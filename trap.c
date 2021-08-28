@@ -86,6 +86,15 @@ trap(struct trapframe *tf)
               tf->trapno, cpuid(), tf->eip, rcr2());
       panic("trap");
     }
+
+//lab3
+	if(tf -> trapno == 14){
+		cprintf("stack error");	
+	if(growstack() == 0)
+		break;
+	}
+//end lab3
+
     // In user space, assume process misbehaved.
     cprintf("pid %d %s: trap %d err %d on cpu %d "
             "eip 0x%x addr 0x%x--kill proc\n",

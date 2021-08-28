@@ -121,6 +121,10 @@ int             wait(void);
 void            wakeup(void*);
 void            yield(void);
 
+	//lab3
+	int growstack(void);
+
+
 // swtch.S
 void            swtch(struct context**, struct context*);
 
